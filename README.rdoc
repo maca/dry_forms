@@ -1,4 +1,4 @@
-= formidable_builder
+= dry_forms
 
 Description goes here.
 

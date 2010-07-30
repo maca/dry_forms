@@ -4,11 +4,11 @@ require 'rake'
 begin
   require 'jeweler'
   Jeweler::Tasks.new do |gem|
-    gem.name = "formidable_builder"
-    gem.summary = %Q{TODO: one-line summary of your gem}
-    gem.description = %Q{TODO: longer description of your gem}
+    gem.name = "dry_forms"
+    gem.summary = %Q{Form builder additions for drier and localized forms, and association fields adding and removing with jQuery sweetness}
+    gem.description = %Q{Form builder additions for drier and localized forms, and association fields adding and removing with jQuery sweetness inspired by Ryan Bates' Railcast #197}
     gem.email = "macarui@gmail.com"
-    gem.homepage = "http://github.com/maca/formidable_builder"
+    gem.homepage = "http://github.com/maca/dry_forms"
     gem.authors = ["Macario Ortega"]
     gem.add_development_dependency "thoughtbot-shoulda", ">= 0"
     # gem is a Gem::Specification... see http://www.rubygems.org/read/chapter/20 for additional settings
@@ -47,7 +47,7 @@ Rake::RDocTask.new do |rdoc|
   version = File.exist?('VERSION') ? File.read('VERSION') : ""
 
   rdoc.rdoc_dir = 'rdoc'
-  rdoc.title = "formidable_builder #{version}"
+  rdoc.title = "dry_forms #{version}"
   rdoc.rdoc_files.include('README*')
   rdoc.rdoc_files.include('lib/**/*.rb')
 end
