@@ -10,7 +10,7 @@ module DryForms
         label_text = opts.delete(:label_text)    || @object ? @object.class.human_attribute_name(attribute) : attribute.to_s.titleize
         label_opts = opts.delete(:label_options) || {}
         html_opts  = opts.delete(:html)          || {}
-        html_opts[:class] = name
+        html_opts[:class] = "#{name} #{html_opts[:class]}".strip
 
         label  = label attribute, label_text
         field  = send name, attribute, *(args << opts)

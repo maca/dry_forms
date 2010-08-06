@@ -28,6 +28,25 @@ class FormHelperTest < ActionView::TestCase
       
       assert_dom_equal html, render(:inline => erb)
     end
+    
+    should 'render check_box with custom markup and display human_attribute_name and html attributes' do
+      erb = <<-ERB
+        <% custom_form_for :post, @post do |f| %>
+          <%= f.custom_text_field :title, :class => 'title', :html => {:id => 'id', :class => 'class'} %>
+        <% end %>
+      ERB
+      
+      html = <<-HTML
+      <form action='/do' method='post'>
+        <dl class="text_field class" id="id">
+        <dt><label for="post_title">Title</label></dt>
+        <dd>#{ text_field(:post, :title, :class => 'title') }</dd>
+        </dl>
+      </form>
+      HTML
+      
+      assert_dom_equal html, render(:inline => erb)
+    end
   end
   
   context 'field with errors' do
