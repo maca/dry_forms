@@ -13,9 +13,11 @@ tmtags
 ## VIM
 *.swp
 
+
 ## PROJECT::GENERAL
 coverage
 rdoc
 pkg
+dry_forms.gemspec
 
 ## PROJECT::SPECIFIC
