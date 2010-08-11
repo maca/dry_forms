@@ -5,12 +5,12 @@
 
 Gem::Specification.new do |s|
   s.name = %q{dry_forms}
-  s.version = "0.0.0"
+  s.version = "0.1.0"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Macario Ortega"]
-  s.date = %q{2010-07-23}
-  s.description = %q{Form builder additions for drier and localized forms and association fields adding and removing with jQuery sweetness inspired by Ryan Bates' Railcast #197}
+  s.date = %q{2010-08-11}
+  s.description = %q{Form builder additions for drier and localized forms, and association fields adding and removing with jQuery sweetness inspired by Ryan Bates' Railcast #197}
   s.email = %q{macarui@gmail.com}
   s.extra_rdoc_files = [
     "LICENSE",
@@ -23,13 +23,21 @@ Gem::Specification.new do |s|
      "README.rdoc",
      "Rakefile",
      "VERSION",
-     "test/helper.rb"
+     "dry_forms.gemspec",
+     "generators/dry_forms_js/dry_forms_js_generator.rb",
+     "generators/dry_forms_js/templates/jquery.dry_forms.associations.js",
+     "lib/dry_forms.rb",
+     "lib/dry_forms/builder_additions.rb",
+     "lib/dry_forms/form_helper_additions.rb",
+     "test/helper.rb",
+     "test/support/models.rb",
+     "test/test_dry_forms.rb"
   ]
   s.homepage = %q{http://github.com/maca/dry_forms}
   s.rdoc_options = ["--charset=UTF-8"]
   s.require_paths = ["lib"]
   s.rubygems_version = %q{1.3.6}
-  s.summary = %q{Form builder additions for drier and localized forms and association fields adding and removing with jQuery sweetness}
+  s.summary = %q{Form builder additions for drier and localized forms, and association fields adding and removing with jQuery sweetness}
   s.test_files = [
     "test/helper.rb",
      "test/support/models.rb",
