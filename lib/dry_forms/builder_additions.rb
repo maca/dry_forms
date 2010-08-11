@@ -30,7 +30,7 @@ module DryForms
 
       association_class = @object.class.reflect_on_association(association.to_sym).klass
       singular_name     = association.singularize
-      fields            = association_fields association, &block
+      fields            = @object.send(association).map{ |obj| association_fields(association, obj, &block) }.join
       new_object        = @object.send(association).build options.delete(:default_attributes) || {}
       js_fields         = association_fields association, new_object, :child_index => "new_#{singular_name}", &block
 
@@ -51,16 +51,14 @@ module DryForms
     end
 
     private
-    def association_fields association, object = nil, opts = {}, &block
+    def association_fields association, object, opts = {}, &block
       opts.merge! :html => {:class => "associated", :'data-association' => association.singularize}
       
       fields = @template.capture do
         custom_fields_for association.to_sym, object, opts do |fields|
-          <<-HTML
-          #{fields.hidden_field :_destroy}
-          #{yield fields}
-          <a class="remove" href="#">#{I18n.t "dry_forms.remove"}</a>
-          HTML
+          @template.concat fields.hidden_field :_destroy, :class => 'destroy'
+          yield fields
+          @template.concat %{<a class="remove" href="#">#{I18n.t "dry_forms.remove"}</a>}
         end
       end
     end

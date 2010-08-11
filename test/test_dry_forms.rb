@@ -4,9 +4,9 @@ class FormHelperTest < ActionView::TestCase
   tests ActionView::Helpers::FormHelper
   
   def setup
-    @post    = Post.new    :title => "Hello World", :body => "Has to work"
-    @author  = Author.new  :name  => "Macario"
-    @comment = Comment.new :title => "Hello World", :body => "Looking good"
+    @post    = Post.create    :title => "Hello World", :body => "Has to work"
+    @author  = Author.create  :name  => "Macario"
+    @comment = Comment.create :title => "Hello World", :body => "Looking good"
   end
 
   context 'helper method rendering' do
@@ -68,7 +68,7 @@ class FormHelperTest < ActionView::TestCase
     
       js_fields = <<-HTML
       <fieldset class="associated" data-association="post">
-        <input id="author_posts_attributes_new_post__destroy" name="author[posts_attributes][new_post][_destroy]" type="hidden" />
+        <input class="destroy" id="author_posts_attributes_new_post__destroy" name="author[posts_attributes][new_post][_destroy]" type="hidden" />
         <input id="author_posts_attributes_new_post_title" name="author[posts_attributes][new_post][title]" size="30" type="text" />
         <a class="remove" href="#">translation missing: en, dry_forms, remove</a>
       </fieldset>
@@ -91,8 +91,9 @@ class FormHelperTest < ActionView::TestCase
       assert_dom_equal html, render(:inline => erb)
     end
 
-    should 'render field for associations' do
-      @author.posts << @post
+    should 'render field for existing associations' do
+      @author.posts.create! :title => "Hello World", :body => "Looking good"
+      @author.posts.create! :title => "Hello World 2", :body => "Looking good"
       
       erb = <<-ERB
         <% form_for :author, @author do |form| %>
@@ -105,7 +106,7 @@ class FormHelperTest < ActionView::TestCase
     
       js_fields = <<-HTML
       <fieldset class="associated" data-association="post">
-        <input id="author_posts_attributes_new_post__destroy" name="author[posts_attributes][new_post][_destroy]" type="hidden" />
+        <input class="destroy" id="author_posts_attributes_new_post__destroy" name="author[posts_attributes][new_post][_destroy]" type="hidden" />
         <input id="author_posts_attributes_new_post_title" name="author[posts_attributes][new_post][title]" size="30" type="text" />
         <a class="remove" href="#">translation missing: en, dry_forms, remove</a>
       </fieldset>
@@ -116,9 +117,16 @@ class FormHelperTest < ActionView::TestCase
           <h2>Posts</h2>
           <div id="posts">
             <fieldset class="associated" data-association="post">
-              <input name="author[posts_attributes][0][_destroy]" id="author_posts_attributes_0__destroy" type="hidden" />
-              <input name="author[posts_attributes][0][title]" size="30" id="author_posts_attributes_0_title" value="Hello World" type="text" />
+              <input class="destroy" name="author[posts_attributes][0][_destroy]" id="author_posts_attributes_0__destroy" type="hidden" />
+              <input name="author[posts_attributes][0][title]" size="30" id="author_posts_attributes_0_title" type="text" value="Hello World" />
               <a href="#" class="remove">translation missing: en, dry_forms, remove</a>
+              <input name="author[posts_attributes][0][id]" id="author_posts_attributes_0_id" type="hidden" value="5" />
+            </fieldset>
+            <fieldset class="associated" data-association="post">
+              <input class="destroy" name="author[posts_attributes][1][_destroy]" id="author_posts_attributes_1__destroy" type="hidden" />
+              <input name="author[posts_attributes][1][title]" size="30" id="author_posts_attributes_1_title" type="text" value="Hello World 2"  />
+              <a href="#" class="remove">translation missing: en, dry_forms, remove</a>
+              <input name="author[posts_attributes][1][id]" id="author_posts_attributes_1_id" type="hidden" value="6" />
             </fieldset>
             <script type="text/javascript">
             //<![CDATA[

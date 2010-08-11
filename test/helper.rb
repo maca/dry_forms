@@ -24,6 +24,7 @@ class ActionView::TestCase::TestController
     @url_for_options = options
     "/do"
   end
+
 end
 
 class ActionView::Base
