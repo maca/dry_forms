@@ -15,12 +15,21 @@ module DryForms
         label  = label attribute, label_text
         field  = send name, attribute, *(args << opts)
         
-        DryForms.field_markup label, field, @object && @object.errors[attribute], html_opts
+        errors =      
+        if @object and name == 'file_field' # Not specked, for paperclip
+          %w(file_name content_type file_size).map { |f| @object.errors["#{attribute}_#{f}".to_sym] }.unshift @object.errors[attribute]
+        elsif @object
+          @object.errors[attribute]
+        end
+        
+        DryForms.field_markup label, field, [*errors].compact, html_opts
       end
     end
 
-    def fields_for_association association, options = {}, &block
+    def fields_for_association association, *args, &block
+      options     = args.extract_options!
       association = association.to_s
+      objects     =  args.first ? [*args.first] : @object.send(association)
 
       unless @object.respond_to? "#{association.pluralize}_attributes="
         raise NotImplementedError, "Please call `accepts_nested_attributes_for :#{association.pluralize}` in your `#{@object.class}` Model"
@@ -30,7 +39,7 @@ module DryForms
 
       association_class = @object.class.reflect_on_association(association.to_sym).klass
       singular_name     = association.singularize
-      fields            = @object.send(association).map{ |obj| association_fields(association, obj, &block) }.join
+      fields            = objects.map{ |obj| association_fields(association, obj, &block) }.join
       new_object        = @object.send(association).build options.delete(:default_attributes) || {}
       js_fields         = association_fields association, new_object, :child_index => "new_#{singular_name}", &block
 
@@ -38,7 +47,7 @@ module DryForms
       <div id="#{association}">
         #{fields}
         #{@template.javascript_tag "var fields_for_#{singular_name} = '#{js_fields.strip.gsub /\n\s+|\n/, ''}';"}
-        <a href="#" class="add_fields" data-association="#{singular_name}">#{I18n.t 'dry_forms.add', :model => association_class.human_name}</a>
+        <a href="#" class="add_fields" data-association="#{singular_name}">#{I18n.t 'add', :model => association_class.human_name}</a>
       </div>
       HTML
     end
@@ -58,7 +67,7 @@ module DryForms
         custom_fields_for association.to_sym, object, opts do |fields|
           @template.concat fields.hidden_field :_destroy, :class => 'destroy'
           yield fields
-          @template.concat %{<a class="remove" href="#">#{I18n.t "dry_forms.remove"}</a>}
+          @template.concat %{<a class="remove" href="#">#{I18n.t "remove"}</a>}
         end
       end
     end
