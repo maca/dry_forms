@@ -1,11 +1,11 @@
 // github.com/maca/dry_forms
-
 (function(a){
   dryForms = {
     associations :  {
       removeAssociation : function(){
         var fieldset = $(this).closest('fieldset');
         fieldset.slideUp('slow').find('input.destroy').val('1');
+        this.removeCallback(fieldset);
         return false;
       },
 
@@ -17,9 +17,9 @@
         var fields      = $(eval('fields_for_' + association).replace(regexp, association + "_" + new_id)).hide();
         
         fields.find('a.remove').click(dryForms.associations.removeAssociation);
-        this.addCallback(fields);
       
         link.before(fields);
+        this.addCallback(fields);
         fields.slideDown('slow');
         return false;
       }
