@@ -22,7 +22,7 @@ module DryForms
           @object.errors[attribute]
         end
         
-        DryForms.field_markup label, field, [*errors].compact, html_opts
+        ActiveSupport::SafeBuffer.new DryForms.field_markup(label, field, [*errors].compact, html_opts)
       end
     end
 
@@ -43,40 +43,37 @@ module DryForms
       new_object        = @object.send(association).build options.delete(:default_attributes) || {}
       js_fields         = association_fields association, new_object, :child_index => "new_#{singular_name}", &block
 
-      @template.concat <<-HTML
+      association_fields = <<-HTML
       <div id="#{association}">
         #{fields}
         #{@template.javascript_tag "var fields_for_#{singular_name} = '#{js_fields.strip.gsub /\n\s+|\n/, ''}';"}
         <a href="#" class="add_fields" data-association="#{singular_name}">#{I18n.t 'add', :model => association_class.human_name}</a>
       </div>
       HTML
+
+      @template.concat ActiveSupport::SafeBuffer.new association_fields
     end
     
     def custom_fields_for *args, &block
       opts      = args.extract_options!
       html_opts = opts.delete(:html) || {}
       fields    = @template.capture{fields_for *(args << opts), &block}
-      @template.concat DryForms.fields_for_markup(fields, html_opts) unless fields.empty?
+      @template.concat ActiveSupport::SafeBuffer.new DryForms.fields_for_markup(fields, html_opts) unless fields.empty?
     end
 
     private
     def association_fields association, object, opts = {}, &block
       opts.merge! :html => {:class => "associated", :'data-association' => association.singularize}
       
-      fields = @template.capture do
+      association_fields = @template.capture do
         custom_fields_for association.to_sym, object, opts do |fields|
           @template.concat fields.hidden_field :_destroy, :class => 'destroy'
           yield fields
-          @template.concat %{<a class="remove" href="#">#{I18n.t "remove"}</a>}
+          @template.concat ActiveSupport::SafeBuffer.new %{<a class="remove" href="#">#{I18n.t "remove"}</a>}
         end
       end
-    end
 
-    # def submit *args
-    #   options         = args.extract_options!
-    #   options[:class] = "submit #{ options[:class] }".strip
-    #   value           = args.first || I18n.t(@object.new_record? ? 'create' : 'save', :scope => 'helpers.submit')
-    #   super value, options
-    # end
+      ActiveSupport::SafeBuffer.new %{#{association_fields}}
+    end
   end
 end

@@ -12,7 +12,7 @@ class FormHelperTest < ActionView::TestCase
   context 'helper method rendering' do
     should 'render check_box with custom markup and display human_attribute_name' do
       erb = <<-ERB
-        <% custom_form_for :post, @post do |f| %>
+        <% custom_form_for :post, @post, :url => '/do' do |f| %>
           <%= f.custom_text_field :title, :class => 'title' %>
         <% end %>
       ERB
@@ -31,7 +31,7 @@ class FormHelperTest < ActionView::TestCase
     
     should 'render check_box with custom markup and display human_attribute_name and html attributes' do
       erb = <<-ERB
-        <% custom_form_for :post, @post do |f| %>
+        <% custom_form_for :post, @post, :url => '/do' do |f| %>
           <%= f.custom_text_field :title, :class => 'title', :html => {:id => 'id', :class => 'class'} %>
         <% end %>
       ERB
@@ -55,7 +55,7 @@ class FormHelperTest < ActionView::TestCase
         assert_equal false, @post.valid?
         
         erb = <<-ERB
-          <% custom_form_for :post, @post do |f| %>
+          <% custom_form_for :post, @post, :url => '/do' do |f| %>
             <%= f.custom_text_field :title, :class => 'title' %>
           <% end %>
         ERB
@@ -82,7 +82,7 @@ class FormHelperTest < ActionView::TestCase
     
     should 'render js fields' do
       erb = <<-ERB
-        <% form_for :author, @author do |form| %>
+        <% form_for :author, @author, :url => '/do' do |form| %>
           <h2>Posts</h2>
           <% form.fields_for_association :posts do |post| %>
             <%= post.text_field :title %>
@@ -120,7 +120,7 @@ class FormHelperTest < ActionView::TestCase
       @author.posts.create! :title => "Hello World 2", :body => "Looking good"
       
       erb = <<-ERB
-        <% form_for :author, @author do |form| %>
+        <% form_for :author, @author, :url => '/do' do |form| %>
           <h2>Posts</h2>
           <% form.fields_for_association :posts do |post| %>
             <%= post.text_field :title %>
@@ -170,7 +170,7 @@ class FormHelperTest < ActionView::TestCase
       @author.posts.create! :title => "Hello World 2", :body => "Looking good"
 
       erb = <<-ERB
-        <% form_for :author, @author do |form| %>
+        <% form_for :author, @author, :url => '/do' do |form| %>
           <h2>Posts</h2>
           <% form.fields_for_association :posts, @author.posts[0..0] do |post| %>
             <%= post.text_field :title %>
@@ -211,7 +211,7 @@ class FormHelperTest < ActionView::TestCase
 
     should 'raise error if model does not accepts nested attributes for association' do
       assert_raises(NotImplementedError) do 
-        form_for :comment, @comment do |form|
+        form_for :comment, @comment, :url => '/do' do |form|
           form.fields_for_association(:author) {}
         end
       end
@@ -219,7 +219,7 @@ class FormHelperTest < ActionView::TestCase
   
     should 'raise error if model does not accepts nested attributes for pluralized association' do
       assert_raises(NotImplementedError) do 
-        form_for :post, @post do |form|
+        form_for :post, @post, :url => '/do' do |form|
           form.fields_for_association(:author) {}
         end
       end
@@ -227,7 +227,7 @@ class FormHelperTest < ActionView::TestCase
   
     should 'raise argument error if no block is passed' do
       assert_raises(ArgumentError) do 
-        form_for :author, @author do |form|
+        form_for :author, @author, :url => '/do' do |form|
           form.fields_for_association(:posts)
         end
       end

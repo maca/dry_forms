@@ -22,7 +22,6 @@ ActiveRecord::Schema.define :version => 1 do
   end
 end
 
-
 class Post < ActiveRecord::Base
   belongs_to :author
   accepts_nested_attributes_for :author
