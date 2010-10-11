@@ -29,7 +29,8 @@ module DryForms
     def fields_for_association association, *args, &block
       options     = args.extract_options!
       association = association.to_s
-      objects     =  args.first ? [*args.first] : @object.send(association)
+      objects     = args.first ? [*args.first] : @object.send(association)
+      html        = options.delete(:html)
 
       unless @object.respond_to? "#{association.pluralize}_attributes="
         raise NotImplementedError, "Please call `accepts_nested_attributes_for :#{association.pluralize}` in your `#{@object.class}` Model"
@@ -39,9 +40,9 @@ module DryForms
 
       association_class = @object.class.reflect_on_association(association.to_sym).klass
       singular_name     = association.singularize
-      fields            = objects.map{ |obj| association_fields(association, obj, &block) }.join
+      fields            = objects.map{ |obj| association_fields(association, obj, :html => html, &block) }.join
       new_object        = @object.send(association).build options.delete(:default_attributes) || {}
-      js_fields         = association_fields association, new_object, :child_index => "new_#{singular_name}", &block
+      js_fields         = association_fields association, new_object, :child_index => "new_#{singular_name}", :html => html, &block
 
       association_fields = <<-HTML
       <div id="#{association}">
@@ -63,7 +64,8 @@ module DryForms
 
     private
     def association_fields association, object, opts = {}, &block
-      opts.merge! :html => {:class => "associated", :'data-association' => association.singularize}
+      html = opts.delete(:html) || {}
+      opts.merge! :html => html.merge(:class => "associated", :'data-association' => association.singularize)
       
       association_fields = @template.capture do
         custom_fields_for association.to_sym, object, opts do |fields|

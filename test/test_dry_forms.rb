@@ -91,7 +91,7 @@ class FormHelperTest < ActionView::TestCase
       ERB
     
       js_fields = <<-HTML
-      <fieldset class="associated" data-association="post">
+      <fieldset data-association="post" class="associated">
         <input class="destroy" id="author_posts_attributes_new_post__destroy" name="author[posts_attributes][new_post][_destroy]" type="hidden" />
         <input id="author_posts_attributes_new_post_title" name="author[posts_attributes][new_post][title]" size="30" type="text" />
         <a class="remove" href="#">translation missing: en, remove</a>
@@ -129,7 +129,7 @@ class FormHelperTest < ActionView::TestCase
       ERB
     
       js_fields = <<-HTML
-      <fieldset class="associated" data-association="post">
+      <fieldset data-association="post" class="associated">
         <input class="destroy" id="author_posts_attributes_new_post__destroy" name="author[posts_attributes][new_post][_destroy]" type="hidden" />
         <input id="author_posts_attributes_new_post_title" name="author[posts_attributes][new_post][title]" size="30" type="text" />
         <a class="remove" href="#">translation missing: en, remove</a>
@@ -165,6 +165,49 @@ class FormHelperTest < ActionView::TestCase
       assert_dom_equal html, render(:inline => erb)
     end
     
+    should 'render field for existing associations allowing custom html' do
+      @author.posts.create! :title => "Hello World", :body => "Looking good"
+      
+      erb = <<-ERB
+        <% form_for :author, @author, :url => '/do' do |form| %>
+          <h2>Posts</h2>
+          <% form.fields_for_association :posts, :html => {'data-custom' => 'data'} do |post| %>
+            <%= post.text_field :title %>
+          <% end %>
+        <% end %>
+      ERB
+    
+      js_fields = <<-HTML
+      <fieldset data-association="post" class="associated" data-custom="data">
+        <input class="destroy" id="author_posts_attributes_new_post__destroy" name="author[posts_attributes][new_post][_destroy]" type="hidden" />
+        <input id="author_posts_attributes_new_post_title" name="author[posts_attributes][new_post][title]" size="30" type="text" />
+        <a class="remove" href="#">translation missing: en, remove</a>
+      </fieldset>
+      HTML
+    
+      html = <<-HTML
+        <form method="post" action="/do">
+          <h2>Posts</h2>
+          <div id="posts">
+            <fieldset class="associated" data-association="post" data-custom="data">
+              <input class="destroy" name="author[posts_attributes][0][_destroy]" id="author_posts_attributes_0__destroy" type="hidden" />
+              <input name="author[posts_attributes][0][title]" size="30" id="author_posts_attributes_0_title" type="text" value="Hello World" />
+              <a href="#" class="remove">translation missing: en, remove</a>
+              <input name="author[posts_attributes][0][id]" id="author_posts_attributes_0_id" type="hidden" value="#{ @author.posts.first.id }" />
+            </fieldset>
+            <script type="text/javascript">
+            //<![CDATA[
+            var fields_for_post = '#{js_fields.gsub(/\n\s+/, '').strip}';
+//]]>
+            </script>
+            <a href="#" class="add_fields" data-association="post">translation missing: en, add</a>
+          </div>
+        </form>
+      HTML
+    
+      assert_dom_equal html, render(:inline => erb)
+    end
+
     should 'render field for existing associations passing objects' do
       @author.posts.create! :title => "Hello World", :body => "Looking good"
       @author.posts.create! :title => "Hello World 2", :body => "Looking good"
@@ -179,7 +222,7 @@ class FormHelperTest < ActionView::TestCase
       ERB
 
       js_fields = <<-HTML
-      <fieldset class="associated" data-association="post">
+      <fieldset data-association="post" class="associated">
         <input class="destroy" id="author_posts_attributes_new_post__destroy" name="author[posts_attributes][new_post][_destroy]" type="hidden" />
         <input id="author_posts_attributes_new_post_title" name="author[posts_attributes][new_post][title]" size="30" type="text" />
         <a class="remove" href="#">translation missing: en, remove</a>
