@@ -1,4 +1,4 @@
-module DryForms 
+module DryForms
   module BuilderAdditions
     helpers  = ActionView::Helpers::FormBuilder.field_helpers.dup
     helpers -= ['hidden_field', 'apply_form_for_options!', 'label', 'fields_for']
@@ -7,21 +7,21 @@ module DryForms
     helpers.each do |name|
       define_method "custom_#{name}" do |attribute, *args|
         opts       = args.extract_options!
-        label_text = opts.delete(:label_text)    || @object ? @object.class.human_attribute_name(attribute) : attribute.to_s.titleize
+        label_text = opts.delete(:label_text)    || (@object ? @object.class.human_attribute_name(attribute) : attribute.to_s.titleize)
         label_opts = opts.delete(:label_options) || {}
         html_opts  = opts.delete(:html)          || {}
         html_opts[:class] = "#{name} #{html_opts[:class]}".strip
 
         label  = label attribute, label_text
         field  = send name, attribute, *(args << opts)
-        
-        errors =      
+
+        errors =
         if @object and name == 'file_field' # Not specked, for paperclip
           %w(file_name content_type file_size).map { |f| @object.errors["#{attribute}_#{f}".to_sym] }.unshift @object.errors[attribute]
         elsif @object
           @object.errors[attribute]
         end
-        
+
         ActiveSupport::SafeBuffer.new DryForms.field_markup(label, field, [*errors].compact, html_opts)
       end
     end
@@ -41,7 +41,7 @@ module DryForms
       association_class = @object.class.reflect_on_association(association.to_sym).klass
       singular_name     = association.singularize
       fields            = objects.map{ |obj| association_fields(association, obj, :html => html, &block) }.join
-      new_object        = @object.send(association).build options.delete(:default_attributes) || {}
+      new_object        = @object.send(association).build(options.delete(:default_attributes) || {})
       js_fields         = association_fields association, new_object, :child_index => "new_#{singular_name}", :html => html, &block
 
       association_fields = <<-HTML
@@ -54,7 +54,7 @@ module DryForms
 
       @template.concat ActiveSupport::SafeBuffer.new association_fields
     end
-    
+
     def custom_fields_for *args, &block
       opts      = args.extract_options!
       html_opts = opts.delete(:html) || {}
@@ -66,7 +66,7 @@ module DryForms
     def association_fields association, object, opts = {}, &block
       html = opts.delete(:html) || {}
       opts.merge! :html => html.merge(:class => "associated", :'data-association' => association.singularize)
-      
+
       association_fields = @template.capture do
         custom_fields_for association.to_sym, object, opts do |fields|
           @template.concat fields.hidden_field :_destroy, :class => 'destroy'
